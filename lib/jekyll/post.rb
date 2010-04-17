@@ -124,7 +124,7 @@ module Jekyll
         "month"      => date.strftime("%m"),
         "day"        => date.strftime("%d"),
         "title"      => CGI.escape(slug),
-        "categories" => categories.sort.join('/')
+        "categories" => categories.join('/')
       }.inject(template) { |result, token|
         result.gsub(/:#{token.first}/, token.last)
       }.gsub(/\/\//, "/")
@@ -188,8 +188,12 @@ module Jekyll
       path = File.join(dest, CGI.unescape(self.url))
 
       if template[/\.html$/].nil?
-        FileUtils.mkdir_p(path)
-        path = File.join(path, "index.html")
+        if self.site.no_post_dirs
+          path += ".html"
+        else
+          FileUtils.mkdir_p(path)
+          path = File.join(path, "index.html")
+        end
       end
 
       File.open(path, 'w') do |f|
